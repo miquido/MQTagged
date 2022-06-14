@@ -34,18 +34,9 @@ extension Tagged {
 	}
 
 	public func retag<NewTag>(
-		to: NewTag.Type
-	) -> Tagged<RawValue, NewTag> {
-		.init(rawValue: self.rawValue)
-	}
-
-	public func cast<NewTag>(
 		to: Tagged<RawValue, NewTag>.Type
 	) -> Tagged<RawValue, NewTag> {
-		unsafeBitCast(
-			self,
-			to: Tagged<RawValue, NewTag>.self
-		)
+		.init(rawValue: self.rawValue)
 	}
 }
 
