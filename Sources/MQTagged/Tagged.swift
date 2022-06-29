@@ -1,8 +1,40 @@
+/// A structure used to tag a given type.
+///
+/// ``Tagged`` is a type used to tag other types to distinguish the same ``RawValue``  types.
+/// Two or more ``Tagged`` instances which have the same ``RawValue`` type (for example a String) can be tagged
+/// using different ``Tag``types which, unlike a typealias, prevents them from interchangeable usage.
+/// ``Tagged`` tries to mimic its ``RawValue`` type behavior using conditional conformances and dynamic member lookup.
+///
+/// * Example
+///
+/// Usage of the ``Tagged`` struct
+/// ```
+/// enum UsernameTag {}
+/// enum PasswordTag {}
+///
+/// typealias Username = Tagged<String, UsernameTag>
+/// typealias Password = Tagged<String, PasswordTag>
+///
+/// func log(_ username: Username, _ password: Password) {
+///	...
+/// }
+///
+/// let username: Username = "user@name.com"
+/// let password: Password = "pa55w0rD"
+///
+/// authorized(username, password)
+/// ```
+/// In the example above authorize function arguments are using String values, but due to the different ``Tag`` types
+/// those arguments can't be mismatched when the function is called.
 @dynamicMemberLookup
 public struct Tagged<RawValue, Tag> {
 
+	// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+	// Documentation inherited from RawRepresentable.rawValue.
 	public var rawValue: RawValue
 
+	// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+	// Documentation inherited from RawRepresentable.init(rawValue:).
 	public init(
 		rawValue: RawValue
 	) {
@@ -25,6 +57,12 @@ extension Tagged {
 
 extension Tagged {
 
+	/// Map current RawValue using a given function.
+	///
+	/// Create new instance of ``Tagged`` while changing its ``RawValue`` type and/or value using provided function. Mapping does not affect the ``Tag``.
+	///
+	/// - Parameter mapping: Function used to transform the current ``RawValue`` into a new one.
+	/// - Returns: New instance of ``Tagged`` with the same ``Tag`` and transformed ``RawValue``.
 	public func map<Mapped>(
 		_ mapping: (RawValue) throws -> Mapped
 	) rethrows -> Tagged<Mapped, Tag> {
@@ -33,8 +71,14 @@ extension Tagged {
 		)
 	}
 
+	/// Change Tag while keeping rawValue.
+	///
+	/// Create new instance of ``Tagged`` with the same rawValue but using provided NewTag type as its tag.
+	///
+	/// - Parameter tagged: ``Tagged`` type using the same ``RawValue`` type and required tag type.
+	/// - Returns: New instance of ``Tagged`` with the same ``RawValue`` and changed ``Tag``.
 	public func retag<NewTag>(
-		to: Tagged<RawValue, NewTag>.Type
+		to tagged: Tagged<RawValue, NewTag>.Type
 	) -> Tagged<RawValue, NewTag> {
 		.init(rawValue: self.rawValue)
 	}
