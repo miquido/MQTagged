@@ -58,12 +58,12 @@ authorize(password, username) // This won't compile.
 ```
 
 ## Installation
-`MQTagged` can be integrated throught Swift Package Manager. In your `Package.swift` file add the following `dependency`:
+`MQTagged` can be integrated through Swift Package Manager. In your `Package.swift` file add the following `dependency`:
 
 ```swift
 dependencies: [
   .package(
-    url: "https://gitlab.com/miquido/dev/ios/mqtagged.git",
+    url: "https://github.com/miquido/mqtagged.git",
     .upToNextMajor("0.1.0")
   )
 ]
@@ -71,7 +71,7 @@ dependencies: [
 
 ## License
 
-Copyright 2022 Miquido
+Copyright 2022-2023 Miquido
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
