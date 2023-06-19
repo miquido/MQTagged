@@ -5,10 +5,9 @@
 /// using different ``Tag``types which, unlike a typealias, prevents them from interchangeable usage.
 /// ``Tagged`` tries to mimic its ``RawValue`` type behavior using conditional conformances and dynamic member lookup.
 ///
-/// * Example
+/// Example usage of the ``Tagged`` struct:
 ///
-/// Usage of the ``Tagged`` struct
-/// ```
+/// ```swift
 /// enum UsernameTag {}
 /// enum PasswordTag {}
 ///
@@ -35,6 +34,7 @@ public struct Tagged<RawValue, Tag> {
 
 	// swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 	// Documentation inherited from RawRepresentable.init(rawValue:).
+	@_transparent
 	public init(
 		rawValue: RawValue
 	) {
@@ -48,6 +48,7 @@ extension Tagged: RawRepresentable {}
 // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 extension Tagged {
 
+	@inlinable
 	public subscript<Value>(
 		dynamicMember keyPath: KeyPath<RawValue, Value>
 	) -> Value {
@@ -63,10 +64,11 @@ extension Tagged {
 	///
 	/// - Parameter mapping: Function used to transform the current ``RawValue`` into a new one.
 	/// - Returns: New instance of ``Tagged`` with the same ``Tag`` and transformed ``RawValue``.
+	@_transparent
 	public func map<Mapped>(
 		_ mapping: (RawValue) throws -> Mapped
 	) rethrows -> Tagged<Mapped, Tag> {
-		try .init(
+		try Tagged<Mapped, Tag>(
 			rawValue: mapping(self.rawValue)
 		)
 	}
@@ -77,16 +79,18 @@ extension Tagged {
 	///
 	/// - Parameter tagged: ``Tagged`` type using the same ``RawValue`` type and required tag type.
 	/// - Returns: New instance of ``Tagged`` with the same ``RawValue`` and changed ``Tag``.
+	@_transparent
 	public func retag<NewTag>(
 		to tagged: Tagged<RawValue, NewTag>.Type
 	) -> Tagged<RawValue, NewTag> {
-		.init(rawValue: self.rawValue)
+		Tagged<RawValue, NewTag>(rawValue: self.rawValue)
 	}
 }
 
 // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 extension Tagged: CustomStringConvertible {
 
+	@_transparent
 	public var description: String {
 		String(describing: self.rawValue)
 	}
@@ -103,6 +107,7 @@ extension Tagged: CustomDebugStringConvertible {
 // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
 extension Tagged: CustomPlaygroundDisplayConvertible {
 
+	@_transparent
 	public var playgroundDescription: Any {
 		self.rawValue
 	}
@@ -112,6 +117,7 @@ extension Tagged: CustomPlaygroundDisplayConvertible {
 extension Tagged: LosslessStringConvertible
 where RawValue: LosslessStringConvertible {
 
+	@_transparent
 	public init?(
 		_ description: String
 	) {
@@ -125,6 +131,7 @@ where RawValue: LosslessStringConvertible {
 extension Tagged: ExpressibleByUnicodeScalarLiteral
 where RawValue: ExpressibleByUnicodeScalarLiteral {
 
+	@_transparent
 	public init(
 		unicodeScalarLiteral value: RawValue.UnicodeScalarLiteralType
 	) {
@@ -140,6 +147,7 @@ where RawValue: ExpressibleByUnicodeScalarLiteral {
 extension Tagged: ExpressibleByExtendedGraphemeClusterLiteral
 where RawValue: ExpressibleByExtendedGraphemeClusterLiteral {
 
+	@_transparent
 	public init(
 		extendedGraphemeClusterLiteral value: RawValue.ExtendedGraphemeClusterLiteralType
 	) {
@@ -155,6 +163,7 @@ where RawValue: ExpressibleByExtendedGraphemeClusterLiteral {
 extension Tagged: ExpressibleByStringLiteral
 where RawValue: ExpressibleByStringLiteral {
 
+	@_transparent
 	public init(
 		stringLiteral value: RawValue.StringLiteralType
 	) {
@@ -170,6 +179,7 @@ where RawValue: ExpressibleByStringLiteral {
 extension Tagged: ExpressibleByStringInterpolation
 where RawValue: ExpressibleByStringInterpolation {
 
+	@_transparent
 	public init(
 		stringInterpolation value: RawValue.StringInterpolation
 	) {
@@ -185,6 +195,7 @@ where RawValue: ExpressibleByStringInterpolation {
 extension Tagged: ExpressibleByBooleanLiteral
 where RawValue: ExpressibleByBooleanLiteral {
 
+	@_transparent
 	public init(
 		booleanLiteral value: RawValue.BooleanLiteralType
 	) {
@@ -200,6 +211,7 @@ where RawValue: ExpressibleByBooleanLiteral {
 extension Tagged: ExpressibleByIntegerLiteral
 where RawValue: ExpressibleByIntegerLiteral {
 
+	@_transparent
 	public init(
 		integerLiteral value: RawValue.IntegerLiteralType
 	) {
@@ -215,6 +227,7 @@ where RawValue: ExpressibleByIntegerLiteral {
 extension Tagged: ExpressibleByFloatLiteral
 where RawValue: ExpressibleByFloatLiteral {
 
+	@_transparent
 	public init(
 		floatLiteral value: RawValue.FloatLiteralType
 	) {
@@ -230,6 +243,7 @@ where RawValue: ExpressibleByFloatLiteral {
 extension Tagged: ExpressibleByNilLiteral
 where RawValue: ExpressibleByNilLiteral {
 
+	@_transparent
 	public init(
 		nilLiteral: Void
 	) {
@@ -245,6 +259,7 @@ where RawValue: ExpressibleByNilLiteral {
 extension Tagged: ExpressibleByArrayLiteral
 where RawValue: ExpressibleByArrayLiteral {
 
+	@_transparent
 	public init(
 		arrayLiteral elements: RawValue.ArrayLiteralElement...
 	) {
@@ -261,6 +276,7 @@ where RawValue: ExpressibleByArrayLiteral {
 extension Tagged: ExpressibleByDictionaryLiteral
 where RawValue: ExpressibleByDictionaryLiteral {
 
+	@_transparent
 	public init(
 		dictionaryLiteral elements: (RawValue.Key, RawValue.Value)...
 	) {
@@ -277,7 +293,10 @@ where RawValue: ExpressibleByDictionaryLiteral {
 extension Tagged: Encodable
 where RawValue: Encodable {
 
-	public func encode(to encoder: Encoder) throws {
+	@_transparent
+	public func encode(
+		to encoder: Encoder
+	) throws {
 		try rawValue.encode(to: encoder)
 	}
 }
@@ -286,7 +305,10 @@ where RawValue: Encodable {
 extension Tagged: Decodable
 where RawValue: Decodable {
 
-	public init(from decoder: Decoder) throws {
+	@_transparent
+	public init(
+		from decoder: Decoder
+	) throws {
 		self.rawValue = try RawValue(from: decoder)
 	}
 }
@@ -295,6 +317,23 @@ where RawValue: Decodable {
 extension Tagged: Equatable
 where RawValue: Equatable {
 
+	@_transparent
+	public static func == (
+		_ lhs: Self,
+		_ rhs: Self
+	) -> Bool {
+		lhs.rawValue == rhs.rawValue
+	}
+
+	@_transparent
+	public static func != (
+		_ lhs: Self,
+		_ rhs: Self
+	) -> Bool {
+		lhs.rawValue != rhs.rawValue
+	}
+
+	@_transparent
 	public static func == (
 		_ lhs: RawValue,
 		_ rhs: Self
@@ -302,6 +341,15 @@ where RawValue: Equatable {
 		lhs == rhs.rawValue
 	}
 
+	@_transparent
+	public static func != (
+		_ lhs: RawValue,
+		_ rhs: Self
+	) -> Bool {
+		lhs != rhs.rawValue
+	}
+
+	@_transparent
 	public static func == (
 		_ lhs: Self,
 		_ rhs: RawValue
@@ -309,6 +357,15 @@ where RawValue: Equatable {
 		lhs.rawValue == rhs
 	}
 
+	@_transparent
+	public static func != (
+		_ lhs: Self,
+		_ rhs: RawValue
+	) -> Bool {
+		lhs.rawValue != rhs
+	}
+
+	@_transparent
 	public static func ~= (
 		_ lhs: RawValue,
 		_ rhs: Self
@@ -316,6 +373,7 @@ where RawValue: Equatable {
 		lhs == rhs.rawValue
 	}
 
+	@_transparent
 	public static func ~= (
 		_ lhs: Self,
 		_ rhs: RawValue
@@ -331,6 +389,7 @@ where RawValue: Hashable {}
 extension Tagged: Collection
 where RawValue: Collection {
 
+	@_transparent
 	public func index(
 		after idx: RawValue.Index
 	) -> RawValue.Index {
@@ -343,14 +402,17 @@ where RawValue: Collection {
 		self.rawValue[position]
 	}
 
+	@_transparent
 	public var startIndex: RawValue.Index {
 		self.rawValue.startIndex
 	}
 
+	@_transparent
 	public var endIndex: RawValue.Index {
 		self.rawValue.endIndex
 	}
 
+	@_transparent
 	public func makeIterator() -> RawValue.Iterator {
 		self.rawValue.makeIterator()
 	}
@@ -360,11 +422,100 @@ where RawValue: Collection {
 extension Tagged: Comparable
 where RawValue: Comparable {
 
+	@_transparent
 	public static func < (
 		_ lhs: Self,
 		_ rhs: Self
 	) -> Bool {
 		lhs.rawValue < rhs.rawValue
+	}
+
+	@_transparent
+	public static func <= (
+		_ lhs: Self,
+		_ rhs: Self
+	) -> Bool {
+		lhs.rawValue <= rhs.rawValue
+	}
+
+	@_transparent
+	public static func > (
+		_ lhs: Self,
+		_ rhs: Self
+	) -> Bool {
+		lhs.rawValue > rhs.rawValue
+	}
+
+	@_transparent
+	public static func >= (
+		_ lhs: Self,
+		_ rhs: Self
+	) -> Bool {
+		lhs.rawValue >= rhs.rawValue
+	}
+
+	@_transparent
+	public static func < (
+		_ lhs: Self,
+		_ rhs: RawValue
+	) -> Bool {
+		lhs.rawValue < rhs
+	}
+
+	@_transparent
+	public static func <= (
+		_ lhs: Self,
+		_ rhs: RawValue
+	) -> Bool {
+		lhs.rawValue <= rhs
+	}
+
+	@_transparent
+	public static func > (
+		_ lhs: Self,
+		_ rhs: RawValue
+	) -> Bool {
+		lhs.rawValue > rhs
+	}
+
+	@_transparent
+	public static func >= (
+		_ lhs: Self,
+		_ rhs: RawValue
+	) -> Bool {
+		lhs.rawValue >= rhs
+	}
+
+	@_transparent
+	public static func < (
+		_ lhs: RawValue,
+		_ rhs: Self
+	) -> Bool {
+		lhs < rhs.rawValue
+	}
+
+	@_transparent
+	public static func <= (
+		_ lhs: RawValue,
+		_ rhs: Self
+	) -> Bool {
+		lhs <= rhs.rawValue
+	}
+
+	@_transparent
+	public static func > (
+		_ lhs: RawValue,
+		_ rhs: Self
+	) -> Bool {
+		lhs > rhs.rawValue
+	}
+
+	@_transparent
+	public static func >= (
+		_ lhs: RawValue,
+		_ rhs: Self
+	) -> Bool {
+		lhs >= rhs.rawValue
 	}
 }
 
@@ -378,6 +529,7 @@ where RawValue: Sendable {}
 extension Tagged: Identifiable
 where RawValue: Identifiable {
 
+	@_transparent
 	public var id: RawValue.ID {
 		self.rawValue.id
 	}
@@ -387,19 +539,22 @@ where RawValue: Identifiable {
 extension Tagged: AdditiveArithmetic
 where RawValue: AdditiveArithmetic {
 
+	@_transparent @_semantics("constant_evaluable")
 	public static var zero: Self {
-		.init(rawValue: .zero)
+		Self(rawValue: .zero)
 	}
 
+	@_transparent
 	public static func + (
 		_ lhs: Self,
 		_ rhs: Self
 	) -> Self {
-		.init(
+		Self(
 			rawValue: lhs.rawValue + rhs.rawValue
 		)
 	}
 
+	@_transparent
 	public static func += (
 		_ lhs: inout Self,
 		_ rhs: Self
@@ -407,15 +562,17 @@ where RawValue: AdditiveArithmetic {
 		lhs.rawValue += rhs.rawValue
 	}
 
+	@_transparent
 	public static func - (
 		_ lhs: Self,
 		_ rhs: Self
 	) -> Self {
-		.init(
+		Self(
 			rawValue: lhs.rawValue - rhs.rawValue
 		)
 	}
 
+	@_transparent
 	public static func -= (
 		_ lhs: inout Self,
 		_ rhs: Self
@@ -428,6 +585,7 @@ where RawValue: AdditiveArithmetic {
 extension Tagged: Numeric
 where RawValue: Numeric {
 
+	@_transparent
 	public init?<Source>(
 		exactly source: Source
 	) where Source: BinaryInteger {
@@ -439,19 +597,22 @@ where RawValue: Numeric {
 		}
 	}
 
+	@_transparent
 	public var magnitude: RawValue.Magnitude {
 		self.rawValue.magnitude
 	}
 
+	@_transparent
 	public static func * (
 		_ lhs: Self,
 		_ rhs: Self
 	) -> Self {
-		.init(
+		Self(
 			rawValue: lhs.rawValue * rhs.rawValue
 		)
 	}
 
+	@_transparent
 	public static func *= (
 		_ lhs: inout Self,
 		_ rhs: Self
@@ -488,16 +649,18 @@ where RawValue: AsyncSequence {
 extension Tagged: Strideable
 where RawValue: Strideable {
 
+	@_transparent
 	public func distance(
 		to other: Self
 	) -> RawValue.Stride {
 		self.rawValue.distance(to: other.rawValue)
 	}
 
+	@_transparent
 	public func advanced(
 		by n: RawValue.Stride
 	) -> Self {
-		.init(
+		Self(
 			rawValue: self.rawValue.advanced(by: n)
 		)
 	}
